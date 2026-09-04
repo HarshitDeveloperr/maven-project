@@ -2,7 +2,7 @@ pipeline
 {
 
 agent {
-  label 'DevServer'
+  label 'server1'
 }
 
 parameters {
