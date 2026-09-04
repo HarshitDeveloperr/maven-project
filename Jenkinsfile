@@ -22,10 +22,10 @@ stages{
     {
         steps {
             script{
-                file = load "script.groovy"
+                def file = load "script.groovy"
                 file.hello()
             }
-            sh 'mvn clean package -DskipTests=true'
+            bat 'mvn clean package -DskipTests=true'
            
         }
 
@@ -38,19 +38,19 @@ stages{
         parallel {
             stage('testA')
             {
-                agent { label 'DevServer' }
+                agent { label 'server1' }
                 steps{
                     echo " This is test A"
-                    sh "mvn test"
+                    bat "mvn test"
                 }
                 
             }
             stage('testB')
             {
-                agent { label 'DevServer' }
+                agent { label 'server1' }
                 steps{
                 echo "this is test B"
-                sh "mvn test"
+                bat "mvn test"
                 }
             }
         }
@@ -69,15 +69,15 @@ stages{
     {
         when { expression {params.select_environment == 'dev'}
         beforeAgent true}
-        agent { label 'DevServer' }
+        agent { label 'Built-In Node' }
         steps
         {
-            dir("/var/www/html")
+            dir('C:\\deploy\\dev')
             {
                 unstash "maven-build"
             }
-            sh """
-            cd /var/www/html/
+            bat """
+           
             jar -xvf webapp.war
             """
         }
@@ -87,18 +87,18 @@ stages{
     {
       when { expression {params.select_environment == 'prod'}
         beforeAgent true}
-        agent { label 'ProdServer' }
+        agent { label 'server1' }
         steps
         {
              timeout(time:5, unit:'DAYS'){
                 input message: 'Deployment approved?'
              }
-            dir("/var/www/html")
+           dir('C:\\deploy\\prod')
             {
                 unstash "maven-build"
             }
-            sh """
-            cd /var/www/html/
+            bat """
+            
             jar -xvf webapp.war
             """
         }  
